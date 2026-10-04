@@ -1,0 +1,28 @@
+# ==========================================
+# AgriLens Backend - Production Dependencies
+# ==========================================
+
+# Core Web Framework & ASGI Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+
+# Database & ORM
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+
+# Data Validation & Serialization
+pydantic>=2.8.0
+
+# Numerical Computing & Data Analysis Engine
+pandas>=2.2.0
+numpy>=1.26.0
+scipy>=1.13.0
+
+# Authentication & Cryptography
+pyjwt>=2.9.0
+bcrypt>=4.2.0
+passlib>=1.7.4
+
+# File Upload Handling & Spreadsheet Parsing
+python-multipart>=0.0.9
+openpyxl>=3.1.5
