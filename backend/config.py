@@ -25,10 +25,14 @@ if ENVIRONMENT == "production" and (not SECRET_KEY or SECRET_KEY == DEFAULT_DEV_
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", str(60 * 24)))  # 24 hours
 
-# Database URL with automated Postgres URL scheme normalization (postgres:// -> postgresql://)
+# Database URL with automated Postgres driver normalization (explicit psycopg2 driver)
 raw_db_url = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'agrilens.db'}")
 if raw_db_url.startswith("postgres://"):
-    DATABASE_URL = raw_db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = raw_db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif raw_db_url.startswith("postgresql://"):
+    DATABASE_URL = raw_db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+elif raw_db_url.startswith("postgresql+psycopg://"):
+    DATABASE_URL = raw_db_url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
 else:
     DATABASE_URL = raw_db_url
 
