@@ -8,17 +8,19 @@ from pathlib import Path
 from typing import Optional, List, Dict, Tuple
 import pandas as pd
 
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, status
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy import text
 from sqlalchemy.orm import Session
+import traceback
 
 from .config import (
     UPLOAD_DIR, SAMPLE_DIR, MAX_UPLOAD_SIZE_BYTES, ALLOWED_EXTENSIONS,
     ENVIRONMENT, ALLOWED_ORIGINS, ENABLE_DEMO_USERS
 )
-from .database import engine, Base, SessionLocal, get_db
+from .database import engine, Base, SessionLocal, get_db, get_engine, get_engine_type, is_db_connected
 from .models import User, DatasetRecord
 from .schemas import (
     UserRegister, UserLogin, UserResponse, TokenResponse,
@@ -49,8 +51,9 @@ logging.basicConfig(level=logging.INFO)
 # Safe Database tables initialization
 def init_db():
     try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("[DB] Database tables initialized successfully")
+        active_eng = get_engine()
+        Base.metadata.create_all(bind=active_eng)
+        logger.info(f"[DB] Database tables initialized successfully on {get_engine_type()}")
     except Exception as e:
         logger.error(f"[DB] Warning: could not initialize database tables immediately: {e}")
 
@@ -74,6 +77,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global Exception Handlers ensuring CORS headers are ALWAYS returned even on internal failures
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"[Unhandled Exception] {request.method} {request.url.path}: {exc}\n{traceback.format_exc()}")
+    origin = request.headers.get("origin")
+    allow_origin = origin if origin else "*"
+    response = JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {str(exc)}"}
+    )
+    response.headers["Access-Control-Allow-Origin"] = allow_origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    origin = request.headers.get("origin")
+    allow_origin = origin if origin else "*"
+    response = JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail}
+    )
+    response.headers["Access-Control-Allow-Origin"] = allow_origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
 
 # Seed demo users for local development / demonstration if enabled
 def seed_demo_users():
@@ -111,11 +144,19 @@ seed_demo_users()
 # ---------------- SYSTEM HEALTH ----------------
 
 @app.get("/api/health")
-def health_check():
+def health_check(db: Session = Depends(get_db)):
+    db_status = "connected"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+
     return {
-        "status": "healthy",
+        "status": "healthy" if "unhealthy" not in db_status else "degraded",
         "app": "AgriLens - Agricultural Data Analysis & Visualization",
         "environment": ENVIRONMENT,
+        "database": get_engine_type(),
+        "database_status": db_status,
         "version": "1.0.0"
     }
 
@@ -275,9 +316,25 @@ def load_demo_dataset(
     db: Session = Depends(get_db)
 ):
     """
-    Instantly loads the verified authentic Indian Agricultural dataset
-    from Directorate of Economics and Statistics & IMD Pune.
+    Instantly loads or reuses the verified Indian Agricultural demonstration dataset.
+    Reuses existing active demo record if already loaded to avoid creating redundant duplicate records.
     """
+    # 1. Deduplication check: if an official demo dataset already exists for this user / session, reuse it
+    existing_demo = db.query(DatasetRecord).filter(
+        DatasetRecord.is_official_sample == True,
+        DatasetRecord.user_id == (current_user.id if current_user else None)
+    ).order_by(DatasetRecord.uploaded_at.desc()).first()
+
+    if existing_demo and existing_demo.profile_json:
+        try:
+            cached_profile = json.loads(existing_demo.profile_json)
+            # Verify ID and basic keys
+            if cached_profile.get("dataset_id") or cached_profile.get("id"):
+                logger.info(f"[Demo] Reusing existing demo dataset id={existing_demo.id}")
+                return cached_profile
+        except Exception as parse_err:
+            logger.warning(f"[Demo] Could not parse existing profile JSON: {parse_err}")
+
     save_official_sample_if_needed()
 
     safe_filename = f"official_sample_{uuid.uuid4().hex[:8]}.csv"

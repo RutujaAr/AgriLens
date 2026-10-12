@@ -1,8 +1,8 @@
 import React from 'react';
 import { 
-  BarChart3, UploadCloud, Database, Sprout, PieChart, 
-  CloudRain, MapPin, Sparkles, FileText, CheckCircle2, 
-  AlertTriangle, ShieldCheck, ArrowRight, RefreshCw, Layers
+  BarChart3, UploadCloud, Database, Sprout, 
+  CloudRain, MapPin, FileText, CheckCircle2, 
+  ShieldCheck, RefreshCw, Layers
 } from 'lucide-react';
 
 export default function DashboardView({ 
@@ -234,13 +234,11 @@ export default function DashboardView({
         </h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-          {t.dashboard.pipelineSteps.map((step, idx) => {
-            const isDone = true;
-            return (
-              <div 
-                key={idx}
-                className="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 flex flex-col justify-between"
-              >
+          {t.dashboard.pipelineSteps.map((step, idx) => (
+            <div 
+              key={idx}
+              className="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 flex flex-col justify-between"
+            >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] font-bold text-emerald-800">Step {idx + 1}</span>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -249,8 +247,7 @@ export default function DashboardView({
                   {step}
                 </p>
               </div>
-            );
-          })}
+          ))}
         </div>
       </div>
 

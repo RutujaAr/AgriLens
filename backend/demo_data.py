@@ -6,11 +6,11 @@ from .config import SAMPLE_DIR
 SAMPLE_CSV_PATH = SAMPLE_DIR / "india_agriculture_official_sample.csv"
 
 OFFICIAL_SOURCE_METADATA = {
-    "dataset_name": "All-India Crop Production, Yield and Agro-Climatic Indicators",
+    "dataset_name": "Curated All-India Crop Production & Agro-Climatic Demonstration Dataset",
     "source_organization": "Directorate of Economics and Statistics (DES), Department of Agriculture & Farmers Welfare, Ministry of Agriculture, Govt. of India & IMD Pune",
-    "source_url": "https://eands.dacnet.nic.in/APY_96_To_21.htm",
-    "secondary_url": "https://data.gov.in/resource/state-wise-crop-production-and-productivity-statistics",
-    "publication": "Agricultural Statistics at a Glance (DES, Ministry of Agriculture & Farmers Welfare)",
+    "source_url": "https://upag.gov.in",
+    "secondary_url": "https://agriwelfare.gov.in",
+    "publication": "Agricultural Statistics at a Glance (DES) & UPAg Unified Portal for Agricultural Statistics",
     "coverage_years": "2017 to 2022",
     "variables": [
         "State",
@@ -24,8 +24,8 @@ OFFICIAL_SOURCE_METADATA = {
         "Fertilizer_Usage_kg_per_ha",
         "Average_Temperature_C"
     ],
-    "description": "Authentic agricultural statistics compiled from official state-level crop cutting experiments and agro-meteorological observations under DES and IMD Pune. Features primary Indian staple and cash crops across major agricultural states.",
-    "verification_status": "Verified Official Government Data",
+    "description": "Curated demonstration dataset compiled according to historical crop cutting experiment benchmarks and agro-meteorological reporting frameworks published by DES and IMD Pune. Features primary Indian staple and cash crops across major agricultural states with controlled scenarios for data cleaning and pipeline verification.",
+    "verification_status": "Curated Benchmark Demonstration Dataset",
     "download_available": True
 }
 

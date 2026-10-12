@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Database, Search, ArrowUpDown, CheckCircle2, 
-  HelpCircle, ChevronLeft, ChevronRight, Tag, Layers 
+  ChevronLeft, ChevronRight, Layers 
 } from 'lucide-react';
 
 export default function InspectionView({ profile, t }) {
@@ -11,10 +11,8 @@ export default function InspectionView({ profile, t }) {
   const [sortAsc, setSortAsc] = useState(true);
   const rowsPerPage = 10;
 
-  if (!profile) return null;
-
-  const rawRows = profile.preview_rows || [];
-  const columns = profile.columns || [];
+  const rawRows = profile?.preview_rows || [];
+  const columns = profile?.columns || [];
 
   // Filter & Sort preview rows
   const filteredRows = useMemo(() => {
@@ -45,6 +43,8 @@ export default function InspectionView({ profile, t }) {
 
     return result;
   }, [rawRows, searchTerm, sortCol, sortAsc]);
+
+  if (!profile) return null;
 
   const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
   const pagedRows = filteredRows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);

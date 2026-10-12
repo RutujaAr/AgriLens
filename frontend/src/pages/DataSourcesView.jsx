@@ -7,18 +7,18 @@ import { api, API_BASE } from '../api';
 
 const VERIFIED_FALLBACK_SOURCES = [
   {
-    dataset_name: "All-India Crop Production, Yield and Agro-Climatic Indicators",
+    dataset_name: "Curated All-India Crop Production & Agro-Climatic Demonstration Dataset",
     source_organization: "Directorate of Economics and Statistics (DES), Department of Agriculture & Farmers Welfare, Ministry of Agriculture, Govt. of India & IMD Pune",
-    source_url: "https://eands.dacnet.nic.in/APY_96_To_21.htm",
-    publication: "Agricultural Statistics at a Glance (DES, Ministry of Agriculture & Farmers Welfare)",
+    source_url: "https://upag.gov.in",
+    publication: "Agricultural Statistics at a Glance (DES) & UPAg Unified Portal for Agricultural Statistics",
     coverage_years: "2017 to 2022",
     variables: [
       "State", "Year", "Season", "Crop", "Cultivated_Area_ha",
       "Crop_Production_tonnes", "Crop_Yield_kg_per_ha", "Annual_Rainfall_mm",
       "Fertilizer_Usage_kg_per_ha", "Average_Temperature_C"
     ],
-    description: "Authentic agricultural statistics compiled from official state-level crop cutting experiments and agro-meteorological observations under DES and IMD Pune. Features primary Indian staple and cash crops across major agricultural states.",
-    verification_status: "Verified Official Government Data",
+    description: "Curated demonstration dataset compiled according to historical crop cutting experiment benchmarks and agro-meteorological reporting frameworks published by DES and IMD Pune. Features primary Indian staple and cash crops across major agricultural states with controlled scenarios for data cleaning and pipeline verification.",
+    verification_status: "Curated Benchmark Demonstration Dataset",
     download_available: true
   },
   {
@@ -56,7 +56,7 @@ const VERIFIED_FALLBACK_SOURCES = [
   }
 ];
 
-export default function DataSourcesView({ t }) {
+export default function DataSourcesView({ t, onExploreDemo, isDemoLoading = false }) {
   const [sources, setSources] = useState(VERIFIED_FALLBACK_SOURCES);
   const [loading, setLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState('verified'); // 'verified', 'syncing', 'synced', 'cached'
@@ -138,26 +138,63 @@ export default function DataSourcesView({ t }) {
         </div>
       </div>
 
-      {/* Download Sample Dataset Card */}
-      <div className="bg-white rounded-2xl p-6 border border-agri-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-base font-bold text-agri-dark flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
-            <span>{t.sources.sampleDatasetTitle}</span>
-          </h3>
-          <p className="text-xs text-agri-muted mt-1">
-            Directly download the official Ministry of Agriculture (DES) and IMD Pune sample dataset used in this project.
+      {/* Canonical Sample Dataset Actions Card */}
+      <div className="bg-white rounded-2xl p-6 border border-agri-border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-agri-dark flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-600" />
+              <span>{t.sources.sampleDatasetTitle}</span>
+            </h3>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+              DES & IMD Curated Benchmark
+            </span>
+          </div>
+          <p className="text-xs text-agri-muted leading-relaxed max-w-xl">
+            {t.sources.sampleDatasetSubtitle || "Download the canonical CSV file to your device for offline analysis, or explore it directly inside AgriLens."}
           </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-gray-500 pt-1">
+            <span>• <strong>Download CSV:</strong> saves the raw file to your computer</span>
+            <span>• <strong>Explore in AgriLens:</strong> activates pipeline & analytics</span>
+          </div>
         </div>
 
-        <a
-          href={`${API_BASE}/download/sample-csv`}
-          download="All_India_Agriculture_Official_Sample_DES_IMD.csv"
-          className="px-4 py-2.5 rounded-xl bg-agri-dark text-white font-semibold text-xs hover:bg-agri-primary shadow-sm transition-all flex items-center gap-2 shrink-0"
-        >
-          <Download className="w-4 h-4" />
-          <span>{t.sources.downloadSampleBtn}</span>
-        </a>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+          <a
+            href={`${API_BASE}/download/sample-csv`}
+            download="All_India_Agriculture_Official_Sample_DES_IMD.csv"
+            className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs border border-gray-300 transition-all flex items-center justify-center gap-2 shadow-2xs"
+            title="Download CSV file directly to your disk"
+          >
+            <Download className="w-4 h-4 text-gray-600" />
+            <span>{t.sources.downloadSampleBtn}</span>
+          </a>
+
+          {onExploreDemo && (
+            <button
+              onClick={onExploreDemo}
+              disabled={isDemoLoading}
+              className={`px-4 py-2.5 rounded-xl text-white font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                isDemoLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-agri-dark hover:bg-agri-primary'
+              }`}
+              title="Load dataset into AgriLens active analytics session"
+            >
+              {isDemoLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>{t.sources.exploreInAppBtn || "Explore in AgriLens"}</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Trusted Sources Cards Grid */}

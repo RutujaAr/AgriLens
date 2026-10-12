@@ -52,43 +52,56 @@ async function request(endpoint, options = {}) {
     options.body = JSON.stringify(options.body);
   }
 
-  const timeoutMs = options.timeout || 35000;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutMs = options.timeout || 45000;
+  const maxRetries = options.retries || 0;
 
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!response.ok) {
-      let errorDetail = "An unexpected error occurred.";
-      try {
-        const errorJson = await response.json();
-        errorDetail = errorJson.detail || errorDetail;
-      } catch {
-        errorDetail = response.statusText || errorDetail;
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        let errorDetail = "An unexpected error occurred.";
+        try {
+          const errorJson = await response.json();
+          errorDetail = errorJson.detail || errorDetail;
+        } catch {
+          errorDetail = response.statusText || errorDetail;
+        }
+        throw new Error(errorDetail);
       }
-      throw new Error(errorDetail);
-    }
 
-    return response.json();
-  } catch (err) {
-    clearTimeout(timeoutId);
-    if (err.name === "AbortError") {
-      throw new Error(
-        "Request timed out. The cloud server may be waking up from sleep. Please try again in a few moments."
-      );
+      return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      const isAbort = err.name === "AbortError";
+      const isNetwork = err.message === "Failed to fetch" || err.message.includes("NetworkError");
+
+      if (attempt < maxRetries && (isAbort || isNetwork)) {
+        console.warn(`[AgriLens API] Request to ${endpoint} failed (attempt ${attempt + 1}/${maxRetries + 1}). Retrying in 2.5s...`);
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        continue;
+      }
+
+      if (isAbort) {
+        throw new Error(
+          "Request timed out. The cloud server may be waking up from sleep. Please try again in a few moments."
+        );
+      }
+      if (isNetwork) {
+        throw new Error(
+          "Unable to reach the AgriLens server. Please check your internet connection or verify the backend is online."
+        );
+      }
+      throw err;
     }
-    if (err.message === "Failed to fetch" || err.message.includes("NetworkError")) {
-      throw new Error(
-        "Unable to reach the AgriLens server. Please check your internet connection or verify the backend is online."
-      );
-    }
-    throw err;
   }
 }
 
@@ -107,7 +120,7 @@ export const api = {
       body: formData,
     });
   },
-  loadDemoDataset: () => request("/datasets/demo", { method: "POST" }),
+  loadDemoDataset: () => request("/datasets/demo", { method: "POST", timeout: 60000, retries: 1 }),
   getMyDatasets: () => request("/datasets/my-datasets"),
   getDataset: (id) => request(`/datasets/${id}`),
   cleanDataset: (id, options) => request(`/datasets/${id}/clean`, { method: "POST", body: options }),

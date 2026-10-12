@@ -231,6 +231,8 @@ export default function App() {
         {currentView === 'sources' && (
           <DataSourcesView 
             t={t} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
           />
         )}
       </main>
@@ -243,7 +245,7 @@ export default function App() {
               AgriLens — Agricultural Data Analysis & Visualization
             </p>
             <p className="text-[11px] text-gray-500">
-              B.Tech CSE Minor Project • Developed for authentic agricultural data science & policymaking
+              Decision support & agro-climatic analytics for Indian agriculture
             </p>
           </div>
           <div className="flex items-center gap-4 text-[11px]">

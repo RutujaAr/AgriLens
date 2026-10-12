@@ -2,7 +2,7 @@ export const translations = {
   en: {
     appName: "AgriLens",
     tagline: "Agricultural Data Analysis & Visualization",
-    projectSubtitle: "B.Tech CSE Minor Project",
+    projectSubtitle: "Agricultural Data Intelligence Platform",
 
     // Navigation
     nav: {
@@ -311,10 +311,12 @@ export const translations = {
     // Data Sources
     sources: {
       title: "Recommended Trusted Data Sources",
-      subtitle: "Official, verified agricultural databases for legitimate data science research",
-      notice: "AgriLens emphasizes that statistical insights depend entirely on dataset authenticity. Never present unverified synthetic data as official government statistics.",
-      sampleDatasetTitle: "Bundled Project Demonstration Dataset",
-      downloadSampleBtn: "Download Official Sample Dataset (CSV)",
+      subtitle: "Official agricultural repositories and reference data portals for data science research",
+      notice: "AgriLens emphasizes that statistical insights depend entirely on dataset authenticity. The bundled sample is a curated demonstration dataset modeled on DES & IMD benchmarks, distinct from external live repositories.",
+      sampleDatasetTitle: "Bundled Demonstration Dataset",
+      sampleDatasetSubtitle: "Download the canonical CSV file to your device for offline analysis, or explore it directly inside AgriLens.",
+      downloadSampleBtn: "Download Sample CSV",
+      exploreInAppBtn: "Explore in AgriLens",
       sourceOrg: "Source Organization",
       coverage: "Coverage Years",
       variables: "Variables Covered",
@@ -356,7 +358,7 @@ export const translations = {
   mr: {
     appName: "AgriLens (अॅग्रीलेन्स)",
     tagline: "कृषी डेटा विश्लेषण आणि दृश्यांकन",
-    projectSubtitle: "बी.टेक सीएसई मायनर प्रोजेक्ट",
+    projectSubtitle: "कृषी डेटा बुद्धिमत्ता व्यासपीठ",
 
     // Navigation
     nav: {
@@ -665,10 +667,12 @@ export const translations = {
     // Data Sources
     sources: {
       title: "शिफारस केलेले अधिकृत डेटा स्रोत",
-      subtitle: "अधिकृत आणि पडताळणी केलेले कृषी डेटाबेस",
-      notice: "अॅग्रीलेन्स भर देते की सांख्यिकी विश्लेषण डेटाच्या सत्यतेवर अवलंबून असते. कधीही खोट्या डेटाचा वापर करू नका.",
-      sampleDatasetTitle: "प्रकल्प प्रात्यक्षिकासाठी समाविष्ट अधिकृत डेटासेट",
-      downloadSampleBtn: "अधिकृत नमुना डेटासेट डाउनलोड करा (CSV)",
+      subtitle: "अधिकृत कृषी डेटाबेस आणि संशोधन संदर्भ",
+      notice: "अॅग्रीलेन्स भर देते की सांख्यिकी विश्लेषण डेटाच्या सत्यतेवर अवलंबून असते. समाविष्ट नमुना हा डीईएस आणि आयएमडी अहवालांवर आधारित क्युरेट केलेला प्रात्यक्षिक डेटा आहे.",
+      sampleDatasetTitle: "समाविष्ट प्रात्यक्षिक डेटासेट",
+      sampleDatasetSubtitle: "CSV फाइल तुमच्या संगणकावर डाउनलोड करा किंवा थेट अॅग्रीलेन्समध्ये सक्रिय करून विश्लेषण सुरू करा.",
+      downloadSampleBtn: "नमुना CSV डाउनलोड करा",
+      exploreInAppBtn: "अॅग्रीलेन्समध्ये सुरू करा",
       sourceOrg: "स्रोत संस्था",
       coverage: "कव्हर केलेली वर्षे",
       variables: "समाविष्ट चल",

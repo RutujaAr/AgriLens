@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
-  Sprout, UploadCloud, Database, BarChart3, CloudRain, 
-  MapPin, Sparkles, ShieldCheck, ArrowRight, CheckCircle2, 
+  Sprout, UploadCloud, BarChart3, CloudRain, 
+  MapPin, Sparkles, ShieldCheck, ArrowRight, 
   Layers, Globe2, Compass, Award, Loader2
 } from 'lucide-react';
 
@@ -36,8 +36,6 @@ export default function LandingPage({ t, onGetStarted, onExploreDemo, isDemoLoad
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-agri-leaf/30 shadow-xs text-xs font-semibold text-agri-dark mb-6">
           <Sprout className="w-4 h-4 text-agri-leaf" />
           <span>{t.landing.heroBadge}</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-agri-leaf"></span>
-          <span className="text-agri-muted">B.Tech CSE Project</span>
         </div>
 
         {/* Hero Title */}
@@ -103,28 +101,44 @@ export default function LandingPage({ t, onGetStarted, onExploreDemo, isDemoLoad
           <span>{t.landing.demoSubtitle}</span>
         </p>
 
-        {/* Hero Agricultural Data Preview Graphic */}
+        {/* Core Analytical Workflow Pillars */}
         <div className="mt-12 max-w-4xl mx-auto rounded-2xl border border-agri-border bg-white p-4 shadow-xl">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-            <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
-              <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">Staple Crops</span>
-              <p className="text-xl font-bold text-emerald-950 mt-1">Wheat & Rice</p>
-              <p className="text-[11px] text-emerald-700 mt-0.5">High Yield Regions</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
+            <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Workflow 01</span>
+                <p className="text-sm font-bold text-emerald-950 mt-1">Automated Data Inspection</p>
+                <p className="text-[11px] text-emerald-700 mt-1 leading-snug">
+                  Instant profiling of columns, null counts, data types & quality score.
+                </p>
+              </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-100">
-              <span className="text-[11px] font-semibold text-blue-800 uppercase tracking-wider">Agro-Climate</span>
-              <p className="text-xl font-bold text-blue-950 mt-1">Rainfall r = 0.54</p>
-              <p className="text-[11px] text-blue-700 mt-0.5">Moderate Association</p>
+            <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-100 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Workflow 02</span>
+                <p className="text-sm font-bold text-amber-950 mt-1">Data Cleaning & Quality Checks</p>
+                <p className="text-[11px] text-amber-700 mt-1 leading-snug">
+                  Duplicate removal, null imputation & raw vs. cleaned comparison audit.
+                </p>
+              </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-100">
-              <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider">Data Quality</span>
-              <p className="text-xl font-bold text-amber-950 mt-1">98.5% Score</p>
-              <p className="text-[11px] text-amber-700 mt-0.5">Zero Duplicates Post-Clean</p>
+            <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-100 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-blue-800 uppercase tracking-wider block">Workflow 03</span>
+                <p className="text-sm font-bold text-blue-950 mt-1">Interactive Visualizations</p>
+                <p className="text-[11px] text-blue-700 mt-1 leading-snug">
+                  Dynamic production distribution, yield trends & seasonal crop breakdowns.
+                </p>
+              </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-100">
-              <span className="text-[11px] font-semibold text-purple-800 uppercase tracking-wider">Coverage</span>
-              <p className="text-xl font-bold text-purple-950 mt-1">12 Major States</p>
-              <p className="text-[11px] text-purple-700 mt-0.5">Pan-India GeoJSON</p>
+            <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-100 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-purple-800 uppercase tracking-wider block">Workflow 04</span>
+                <p className="text-sm font-bold text-purple-950 mt-1">Rainfall, Yield & State Analysis</p>
+                <p className="text-[11px] text-purple-700 mt-1 leading-snug">
+                  Pearson statistical correlation & geographic state ranking when supported.
+                </p>
+              </div>
             </div>
           </div>
         </div>

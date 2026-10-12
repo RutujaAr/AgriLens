@@ -84,7 +84,7 @@ export default function ReportView({ profile, t, lang, role = 'farmer' }) {
               </h2>
             </div>
             <p className="text-xs text-agri-muted">
-              {isOfficer ? "B.Tech CSE Minor Project • Agricultural Data Analysis & Verification" : "AgriLens Platform • Farmer Decision Support & Agro-Climatic Intelligence"}
+              {isOfficer ? "AgriLens Analytics Platform • Agricultural Data Analysis & Verification" : "AgriLens Platform • Farmer Decision Support & Agro-Climatic Intelligence"}
             </p>
           </div>
 
