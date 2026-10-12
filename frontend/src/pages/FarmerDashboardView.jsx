@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Sprout, CloudRain, TrendingUp, MapPin, Sparkles, 
-  FileText, UploadCloud, ShieldCheck, CheckCircle2, 
-  ChevronDown, ChevronUp, Info, ArrowUpRight, ArrowRight,
-  BarChart3, PieChart as PieIcon, Loader2, Printer, Check
+  Sprout, CloudRain, MapPin, Sparkles, 
+  UploadCloud, ShieldCheck, CheckCircle2, 
+  ChevronDown, ChevronUp, Info, 
+  Loader2, Printer
 } from 'lucide-react';
 import { 
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+  BarChart, Bar, LineChart, Line, 
   ScatterChart, Scatter, XAxis, YAxis, Tooltip, 
-  ResponsiveContainer, CartesianGrid, Legend, ZAxis 
+  ResponsiveContainer, CartesianGrid, ZAxis 
 } from 'recharts';
 import { api } from '../api';
 import IndiaMap from '../components/IndiaMap';
-
-const CHART_COLORS = ['#2E7D32', '#1B5E20', '#4CAF50', '#F9A825', '#0284C7', '#7C3AED', '#DB2777', '#EA580C'];
 
 export default function FarmerDashboardView({ 
   profile, 
   t, 
   lang, 
   setCurrentView, 
-  onExploreDemo 
+  onExploreDemo,
+  isDemoLoading = false,
+  demoError = null
 }) {
   const [loading, setLoading] = useState(true);
   const [vizData, setVizData] = useState(null);
@@ -51,7 +51,7 @@ export default function FarmerDashboardView({
       }
     };
     fetchFarmerData();
-  }, [profile?.id, profile?.is_cleaned]);
+  }, [profile, profile?.id, profile?.is_cleaned]);
 
   if (!profile) {
     return (
@@ -76,12 +76,39 @@ export default function FarmerDashboardView({
             </button>
             <button
               onClick={onExploreDemo}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white border border-agri-primary text-agri-dark font-semibold text-sm hover:bg-agri-light shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isDemoLoading}
+              className={`w-full sm:w-auto px-6 py-3 rounded-xl border font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                isDemoLoading
+                  ? 'bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-white border-agri-primary text-agri-dark hover:bg-agri-light'
+              }`}
             >
-              <Sprout className="w-4 h-4 text-agri-primary" />
-              <span>{t.landing.btnDemo}</span>
+              {isDemoLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-agri-primary animate-spin" />
+                  <span>Loading Official Dataset...</span>
+                </>
+              ) : (
+                <>
+                  <Sprout className="w-4 h-4 text-agri-primary" />
+                  <span>{t.landing.btnDemo}</span>
+                </>
+              )}
             </button>
           </div>
+
+          {demoError && (
+            <div className="mt-5 max-w-md mx-auto p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between gap-2 text-left">
+              <span>{demoError}</span>
+              <button
+                onClick={onExploreDemo}
+                disabled={isDemoLoading}
+                className="px-2.5 py-1 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 text-[11px] shrink-0 cursor-pointer"
+              >
+                Retry
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -89,7 +116,6 @@ export default function FarmerDashboardView({
 
   const charts = vizData?.charts || [];
   const topCropChart = charts.find(c => c.id === 'crop_production_bar');
-  const cropShareChart = charts.find(c => c.id === 'crop_share_donut');
   const yearlyTrendChart = charts.find(c => c.id === 'yearly_trend_line');
   const insights = insightsData?.insights || [];
 

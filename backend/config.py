@@ -37,9 +37,14 @@ else:
     DATABASE_URL = raw_db_url
 
 # CORS Allowed Origins
-DEFAULT_DEV_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+DEFAULT_DEV_ORIGINS = (
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,"
+    "https://agri-lens-five.vercel.app,https://agrilens.vercel.app"
+)
 ALLOWED_ORIGINS_RAW = os.getenv("ALLOWED_ORIGINS", DEFAULT_DEV_ORIGINS)
 ALLOWED_ORIGINS: List[str] = [origin.strip() for origin in ALLOWED_ORIGINS_RAW.split(",") if origin.strip()]
+if "https://agri-lens-five.vercel.app" not in ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS.append("https://agri-lens-five.vercel.app")
 
 # Demo credentials control (enabled by default in dev, disabled in prod unless explicitly enabled)
 ENABLE_DEMO_USERS_RAW = os.getenv(

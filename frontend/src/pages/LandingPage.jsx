@@ -2,10 +2,10 @@ import React from 'react';
 import { 
   Sprout, UploadCloud, Database, BarChart3, CloudRain, 
   MapPin, Sparkles, ShieldCheck, ArrowRight, CheckCircle2, 
-  Layers, Globe2, Compass, Award
+  Layers, Globe2, Compass, Award, Loader2
 } from 'lucide-react';
 
-export default function LandingPage({ t, onGetStarted, onExploreDemo }) {
+export default function LandingPage({ t, onGetStarted, onExploreDemo, isDemoLoading = false, demoError = null }) {
   const steps = [
     { num: "01", title: t.landing.step1Title, desc: t.landing.step1Desc, icon: UploadCloud, color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
     { num: "02", title: t.landing.step2Title, desc: t.landing.step2Desc, icon: Layers, color: "bg-amber-50 text-amber-700 border-amber-200" },
@@ -62,12 +62,40 @@ export default function LandingPage({ t, onGetStarted, onExploreDemo }) {
 
           <button
             onClick={onExploreDemo}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white border border-agri-primary text-agri-dark font-semibold text-sm hover:bg-agri-light hover:border-agri-dark shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            disabled={isDemoLoading}
+            className={`w-full sm:w-auto px-6 py-3.5 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
+              isDemoLoading
+                ? 'bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-white border-agri-primary text-agri-dark hover:bg-agri-light hover:border-agri-dark'
+            }`}
           >
-            <Compass className="w-4 h-4 text-agri-primary" />
-            <span>{t.landing.btnDemo}</span>
+            {isDemoLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 text-agri-primary animate-spin" />
+                <span>Loading Official Dataset...</span>
+              </>
+            ) : (
+              <>
+                <Compass className="w-4 h-4 text-agri-primary" />
+                <span>{t.landing.btnDemo}</span>
+              </>
+            )}
           </button>
         </div>
+
+        {/* Error notification banner if demo loading failed */}
+        {demoError && (
+          <div className="mt-4 max-w-md mx-auto p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between gap-2 text-left">
+            <span>{demoError}</span>
+            <button
+              onClick={onExploreDemo}
+              disabled={isDemoLoading}
+              className="px-2.5 py-1 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 text-[11px] shrink-0 cursor-pointer"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Demo Subtitle Note */}
         <p className="mt-3 text-xs text-agri-muted font-medium flex items-center justify-center gap-1.5">

@@ -46,8 +46,15 @@ from .analytics_service import (
 logger = logging.getLogger("agrilens")
 logging.basicConfig(level=logging.INFO)
 
-# Initialize Database tables
-Base.metadata.create_all(bind=engine)
+# Safe Database tables initialization
+def init_db():
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("[DB] Database tables initialized successfully")
+    except Exception as e:
+        logger.error(f"[DB] Warning: could not initialize database tables immediately: {e}")
+
+init_db()
 
 app = FastAPI(
     title="AgriLens API",
@@ -58,10 +65,11 @@ app = FastAPI(
 # Response Compression Middleware for optimal network performance
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# CORS Middleware with strict origin control
+# CORS Middleware with strict origin control and wildcard Vercel support
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

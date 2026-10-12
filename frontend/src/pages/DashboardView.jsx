@@ -9,7 +9,9 @@ export default function DashboardView({
   profile, 
   t, 
   setCurrentView, 
-  onExploreDemo 
+  onExploreDemo,
+  isDemoLoading = false,
+  demoError = null
 }) {
   if (!profile) {
     return (
@@ -34,12 +36,39 @@ export default function DashboardView({
             </button>
             <button
               onClick={onExploreDemo}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white border border-agri-primary text-agri-dark font-semibold text-sm hover:bg-agri-light shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isDemoLoading}
+              className={`w-full sm:w-auto px-6 py-3 rounded-xl border font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                isDemoLoading
+                  ? 'bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-white border-agri-primary text-agri-dark hover:bg-agri-light'
+              }`}
             >
-              <Sprout className="w-4 h-4 text-agri-primary" />
-              <span>{t.landing.btnDemo}</span>
+              {isDemoLoading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 text-agri-primary animate-spin" />
+                  <span>Loading Official Dataset...</span>
+                </>
+              ) : (
+                <>
+                  <Sprout className="w-4 h-4 text-agri-primary" />
+                  <span>{t.landing.btnDemo}</span>
+                </>
+              )}
             </button>
           </div>
+
+          {demoError && (
+            <div className="mt-5 max-w-md mx-auto p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center justify-between gap-2 text-left">
+              <span>{demoError}</span>
+              <button
+                onClick={onExploreDemo}
+                disabled={isDemoLoading}
+                className="px-2.5 py-1 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 text-[11px] shrink-0 cursor-pointer"
+              >
+                Retry
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

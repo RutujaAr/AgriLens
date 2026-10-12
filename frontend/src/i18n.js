@@ -32,6 +32,10 @@ export const translations = {
       switchRole: "Switch Mode",
       viewAsFarmer: "Farmer View",
       viewAsOfficer: "Officer View",
+      analyticsMenu: "Analytics",
+      dataPipeline: "Data Pipeline",
+      agriDomain: "Agricultural Insights",
+      requiresDataHint: "Requires active dataset",
     },
 
     // Landing Page
@@ -382,6 +386,10 @@ export const translations = {
       switchRole: "मोड बदला",
       viewAsFarmer: "शेतकरी दृश्य",
       viewAsOfficer: "अधिकारी दृश्य",
+      analyticsMenu: "डेटा व विश्लेषण",
+      dataPipeline: "डेटा पूर्वप्रक्रिया",
+      agriDomain: "कृषी विश्लेषण",
+      requiresDataHint: "डेटासेट आवश्यक आहे",
     },
 
     // Landing Page

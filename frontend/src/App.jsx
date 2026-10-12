@@ -19,28 +19,22 @@ import { getCurrentUser, setCurrentUser, setAuthToken, api } from './api';
 
 export default function App() {
   const [lang, setLang] = useState('en');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getCurrentUser());
   const [guestRole, setGuestRole] = useState('farmer'); // 'farmer' or 'officer'
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState('landing');
   const [activeProfile, setActiveProfile] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [demoError, setDemoError] = useState(null);
 
   const t = translations[lang] || translations.en;
 
   const effectiveRole = user?.role || guestRole;
 
-  // Initialize user session on mount
-  useEffect(() => {
-    const savedUser = getCurrentUser();
-    if (savedUser) {
-      setUser(savedUser);
-    }
-  }, []);
-
   const showToast = (msg, type = "success") => {
     setNotification({ msg, type });
-    setTimeout(() => setNotification(null), 3500);
+    setTimeout(() => setNotification(null), 4500);
   };
 
   const handleLogout = () => {
@@ -70,14 +64,21 @@ export default function App() {
   };
 
   const handleExploreDemo = async () => {
+    setIsDemoLoading(true);
+    setDemoError(null);
+    showToast("Connecting to official agricultural dataset...", "info");
     try {
-      showToast("Loading verified All-India agricultural dataset...", "info");
       const profile = await api.loadDemoDataset();
       setActiveProfile(profile);
       setCurrentView('dashboard');
       showToast("Official dataset loaded successfully!", "success");
     } catch (err) {
-      showToast(err.message || "Failed to load demo dataset", "error");
+      console.error("Demo load failed:", err);
+      const msg = err.message || "Failed to load demo dataset. Please try again.";
+      setDemoError(msg);
+      showToast(msg, "error");
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -128,7 +129,9 @@ export default function App() {
           <LandingPage 
             t={t} 
             onGetStarted={() => setCurrentView(activeProfile ? 'dashboard' : 'upload')} 
-            onExploreDemo={handleExploreDemo} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            demoError={demoError}
           />
         )}
 
@@ -140,13 +143,17 @@ export default function App() {
               lang={lang}
               setCurrentView={setCurrentView}
               onExploreDemo={handleExploreDemo}
+              isDemoLoading={isDemoLoading}
+              demoError={demoError}
             />
           ) : (
             <DashboardView 
               profile={activeProfile} 
               t={t} 
               setCurrentView={setCurrentView} 
-              onExploreDemo={handleExploreDemo} 
+              onExploreDemo={handleExploreDemo}
+              isDemoLoading={isDemoLoading}
+              demoError={demoError}
             />
           )
         )}
