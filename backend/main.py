@@ -20,7 +20,10 @@ from .config import (
     UPLOAD_DIR, SAMPLE_DIR, MAX_UPLOAD_SIZE_BYTES, ALLOWED_EXTENSIONS,
     ENVIRONMENT, ALLOWED_ORIGINS, ENABLE_DEMO_USERS
 )
-from .database import engine, Base, SessionLocal, get_db, get_engine, get_engine_type, is_db_connected
+from .database import (
+    engine, Base, SessionLocal, get_db, get_engine,
+    get_engine_type, get_configured_engine_type, get_db_health_info, is_db_connected
+)
 from .models import User, DatasetRecord
 from .schemas import (
     UserRegister, UserLogin, UserResponse, TokenResponse,
@@ -141,22 +144,34 @@ def seed_demo_users():
 seed_demo_users()
 
 
-# ---------------- SYSTEM HEALTH ----------------
+# ---------------- SYSTEM HEALTH & ROOT INFO ----------------
 
+@app.get("/")
+def root_info():
+    health_info = get_db_health_info()
+    return {
+        "app": "AgriLens - Agricultural Data Analysis & Visualization API",
+        "status": health_info["status"],
+        "environment": ENVIRONMENT,
+        "database": health_info["configured_database"],
+        "active_database": health_info["active_database"],
+        "version": "1.0.0",
+        "health_check": "/api/health",
+        "docs": "/docs"
+    }
+
+@app.get("/health")
 @app.get("/api/health")
 def health_check(db: Session = Depends(get_db)):
-    db_status = "connected"
-    try:
-        db.execute(text("SELECT 1"))
-    except Exception as e:
-        db_status = f"unhealthy: {str(e)}"
-
+    health_info = get_db_health_info()
     return {
-        "status": "healthy" if "unhealthy" not in db_status else "degraded",
+        "status": health_info["status"],
         "app": "AgriLens - Agricultural Data Analysis & Visualization",
         "environment": ENVIRONMENT,
-        "database": get_engine_type(),
-        "database_status": db_status,
+        "database": health_info["configured_database"],
+        "active_database": health_info["active_database"],
+        "database_status": health_info["detail"],
+        "diagnostic": health_info["diagnostic"],
         "version": "1.0.0"
     }
 
@@ -662,6 +677,7 @@ def get_complete_summary(dataset_id: int, db: Session = Depends(get_db)):
 
 # ---------------- DATA SOURCES & VERIFICATION ENDPOINTS ----------------
 
+@app.get("/data-sources", response_model=List[DataSourceInfo])
 @app.get("/api/data-sources", response_model=List[DataSourceInfo])
 def get_trusted_data_sources():
     sources = [
@@ -702,6 +718,7 @@ def get_trusted_data_sources():
     ]
     return sources
 
+@app.get("/download/sample-csv")
 @app.get("/api/download/sample-csv")
 def download_sample_csv():
     save_official_sample_if_needed()

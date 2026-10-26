@@ -8,8 +8,21 @@ import {
 } from 'recharts';
 import { api } from '../api';
 import IndiaMap from '../components/IndiaMap';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function StateAnalysisView({ profile, t }) {
+export default function StateAnalysisView({ profile, t, onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="State-wise Agricultural Analysis"
+        subtitle="Please load or upload a dataset to explore state productivity rankings, regional maps, and zone aggregations."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

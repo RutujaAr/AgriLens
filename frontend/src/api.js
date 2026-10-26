@@ -1,12 +1,16 @@
 const rawApiUrl = import.meta.env.VITE_API_BASE_URL;
 
-if (import.meta.env.PROD && !rawApiUrl) {
-  console.warn(
-    "[AgriLens Production Warning] VITE_API_BASE_URL is not configured in your deployment environment variables. Requests may fail if backend is hosted remotely."
-  );
+let resolvedApiBase;
+if (rawApiUrl && rawApiUrl.trim()) {
+  const cleanUrl = rawApiUrl.trim().replace(/\/+$/, "");
+  resolvedApiBase = cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
+} else if (import.meta.env.PROD) {
+  resolvedApiBase = "https://agrilens-api-eeoq.onrender.com/api";
+} else {
+  resolvedApiBase = "http://127.0.0.1:8000/api";
 }
 
-export const API_BASE = (rawApiUrl ? rawApiUrl.replace(/\/+$/, "") : "http://127.0.0.1:8000/api");
+export const API_BASE = resolvedApiBase;
 
 export function getAuthToken() {
   return localStorage.getItem("agrilens_token");

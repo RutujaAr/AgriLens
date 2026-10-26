@@ -20,13 +20,60 @@ import { getCurrentUser, setCurrentUser, setAuthToken, api } from './api';
 export default function App() {
   const [lang, setLang] = useState('en');
   const [user, setUser] = useState(() => getCurrentUser());
-  const [guestRole, setGuestRole] = useState('farmer'); // 'farmer' or 'officer'
+  const [guestRole, setGuestRole] = useState(() => {
+    try {
+      return localStorage.getItem('agrilens_guest_role') || 'farmer';
+    } catch {
+      return 'farmer';
+    }
+  });
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('landing');
-  const [activeProfile, setActiveProfile] = useState(null);
+  const [activeProfile, setActiveProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('agrilens_active_profile');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [currentView, setCurrentView] = useState(() => {
+    try {
+      return localStorage.getItem('agrilens_current_view') || 'landing';
+    } catch {
+      return 'landing';
+    }
+  });
   const [notification, setNotification] = useState(null);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [demoError, setDemoError] = useState(null);
+
+  useEffect(() => {
+    try {
+      if (activeProfile) {
+        localStorage.setItem('agrilens_active_profile', JSON.stringify(activeProfile));
+      } else {
+        localStorage.removeItem('agrilens_active_profile');
+      }
+    } catch (e) {
+      console.warn("Storage sync failed:", e);
+    }
+  }, [activeProfile]);
+
+  useEffect(() => {
+    try {
+      if (currentView) {
+        localStorage.setItem('agrilens_current_view', currentView);
+      }
+    } catch (e) {
+      console.warn("Storage sync failed:", e);
+    }
+  }, [currentView]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('agrilens_guest_role', guestRole);
+    } catch (e) {}
+  }, [guestRole]);
 
   const t = translations[lang] || translations.en;
 
@@ -170,6 +217,9 @@ export default function App() {
           <InspectionView 
             profile={activeProfile} 
             t={t} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -178,6 +228,9 @@ export default function App() {
             profile={activeProfile} 
             onCleanSuccess={handleCleanSuccess} 
             t={t} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -185,6 +238,9 @@ export default function App() {
           <EDAView 
             profile={activeProfile} 
             t={t} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -193,6 +249,9 @@ export default function App() {
             profile={activeProfile} 
             t={t} 
             lang={lang} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -201,6 +260,9 @@ export default function App() {
             profile={activeProfile} 
             t={t} 
             role={effectiveRole}
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -208,6 +270,9 @@ export default function App() {
           <StateAnalysisView 
             profile={activeProfile} 
             t={t} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -216,6 +281,9 @@ export default function App() {
             profile={activeProfile} 
             t={t} 
             lang={lang} 
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 
@@ -225,6 +293,9 @@ export default function App() {
             t={t} 
             lang={lang} 
             role={effectiveRole}
+            onExploreDemo={handleExploreDemo}
+            isDemoLoading={isDemoLoading}
+            setCurrentView={setCurrentView}
           />
         )}
 

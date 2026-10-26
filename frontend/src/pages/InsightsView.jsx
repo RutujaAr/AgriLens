@@ -4,8 +4,21 @@ import {
   MapPin, ShieldCheck, Loader2 
 } from 'lucide-react';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function InsightsView({ profile, t, lang }) {
+export default function InsightsView({ profile, t, lang, onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Automated Agricultural Insights"
+        subtitle="Please load or upload a dataset to generate automated data-driven insights and agronomic takeaways."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [insightsData, setInsightsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

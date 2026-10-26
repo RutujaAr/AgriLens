@@ -8,10 +8,23 @@ import {
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend 
 } from 'recharts';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
 const COLORS = ['#2E7D32', '#1B5E20', '#4CAF50', '#F9A825', '#0284C7', '#7C3AED', '#DB2777', '#EA580C'];
 
-export default function VisualizationsView({ profile, t, lang }) {
+export default function VisualizationsView({ profile, t, lang, onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Interactive Agricultural Visualizations"
+        subtitle="Please load or upload a dataset to generate automatic production, yield, and regional breakdown charts."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [vizData, setVizData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

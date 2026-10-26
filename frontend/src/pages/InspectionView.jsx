@@ -3,8 +3,9 @@ import {
   Database, Search, ArrowUpDown, CheckCircle2, 
   ChevronLeft, ChevronRight, Layers 
 } from 'lucide-react';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function InspectionView({ profile, t }) {
+export default function InspectionView({ profile, t, onExploreDemo, isDemoLoading = false, setCurrentView }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortCol, setSortCol] = useState(null);
@@ -44,7 +45,17 @@ export default function InspectionView({ profile, t }) {
     return result;
   }, [rawRows, searchTerm, sortCol, sortAsc]);
 
-  if (!profile) return null;
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Dataset Schema & Inspection"
+        subtitle="Please load or upload a dataset to inspect schema definitions, column data types, null percentages, and preview records."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
 
   const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
   const pagedRows = filteredRows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);

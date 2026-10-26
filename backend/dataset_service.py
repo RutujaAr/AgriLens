@@ -315,6 +315,7 @@ def profile_dataset(df: pd.DataFrame, dataset_id: int, original_name: str, file_
 
     return {
         "id": dataset_id,
+        "dataset_id": dataset_id,
         "original_name": original_name,
         "file_type": file_type,
         "file_size_bytes": file_size_bytes,

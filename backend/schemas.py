@@ -42,6 +42,7 @@ class ColumnProfile(BaseModel):
 
 class DatasetProfile(BaseModel):
     id: int
+    dataset_id: Optional[int] = None
     original_name: str
     file_type: str
     file_size_bytes: int

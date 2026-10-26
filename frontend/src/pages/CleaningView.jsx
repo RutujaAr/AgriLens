@@ -4,8 +4,21 @@ import {
   ArrowRight, Layers, RefreshCw, FileText, Check 
 } from 'lucide-react';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function CleaningView({ profile, onCleanSuccess, t }) {
+export default function CleaningView({ profile, onCleanSuccess, t, onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Data Cleaning & Quality Pipeline"
+        subtitle="Please load or upload a dataset to run automated duplicate removal, missing value imputation, and column standardization."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [removeDuplicates, setRemoveDuplicates] = useState(true);
   const [imputeNumerical, setImputeNumerical] = useState('median');
   const [imputeCategorical, setImputeCategorical] = useState('mode');

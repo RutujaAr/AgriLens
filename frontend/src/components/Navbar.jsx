@@ -60,11 +60,9 @@ export default function Navbar({
 
   const handleNavClick = (viewId, requiresData = false) => {
     if (requiresData && !hasActiveDataset) {
-      // Allow switching to view or alert user
-      setCurrentView(viewId);
-    } else {
-      setCurrentView(viewId);
+      return;
     }
+    setCurrentView(viewId);
     setMobileMenuOpen(false);
     setAnalyticsDropdownOpen(false);
   };
@@ -167,15 +165,19 @@ export default function Navbar({
                       return (
                         <button
                           key={item.id}
+                          disabled={requiresActive}
                           onClick={() => handleNavClick(item.id, true)}
-                          className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                            isItemActive
-                              ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                          className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left text-xs transition-colors ${
+                            requiresActive
+                              ? 'opacity-50 cursor-not-allowed bg-gray-50/50 text-gray-400'
+                              : isItemActive
+                              ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200 cursor-pointer'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 cursor-pointer'
                           }`}
+                          title={requiresActive ? "Load or upload a dataset first to unlock this module" : item.desc}
                         >
                           <div className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
-                            isItemActive ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600'
+                            requiresActive ? 'bg-gray-100 text-gray-400' : isItemActive ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600'
                           }`}>
                             <Icon className="w-3.5 h-3.5" />
                           </div>
@@ -202,15 +204,20 @@ export default function Navbar({
 
             {/* 4. Report */}
             <button
-              onClick={() => handleNavClick('report')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                currentView === 'report'
-                  ? 'bg-agri-primary text-white shadow-xs'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              disabled={!hasActiveDataset}
+              onClick={() => handleNavClick('report', true)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                !hasActiveDataset
+                  ? 'opacity-50 cursor-not-allowed text-gray-400'
+                  : currentView === 'report'
+                  ? 'bg-agri-primary text-white shadow-xs cursor-pointer'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer'
               }`}
+              title={!hasActiveDataset ? "Load or upload a dataset first to generate the report" : "View final summary report"}
             >
               <FileText className="w-3.5 h-3.5" />
               <span>{t.nav.report}</span>
+              {!hasActiveDataset && <Lock className="w-2.5 h-2.5 ml-0.5 text-gray-400" />}
             </button>
 
             {/* 5. Data Sources */}
@@ -348,19 +355,25 @@ export default function Navbar({
             {currentAnalyticsItems.map((item) => {
               const Icon = item.icon;
               const isItemActive = currentView === item.id;
+              const requiresActive = !hasActiveDataset;
               return (
                 <button
                   key={item.id}
+                  disabled={requiresActive}
                   onClick={() => handleNavClick(item.id, true)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-xl font-semibold transition-colors cursor-pointer ${
-                    isItemActive ? 'bg-agri-primary text-white' : 'text-gray-700 hover:bg-gray-100'
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-xl font-semibold transition-colors ${
+                    requiresActive
+                      ? 'opacity-50 cursor-not-allowed text-gray-400'
+                      : isItemActive
+                      ? 'bg-agri-primary text-white cursor-pointer'
+                      : 'text-gray-700 hover:bg-gray-100 cursor-pointer'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </div>
-                  {!hasActiveDataset && <Lock className="w-3 h-3 text-gray-400" />}
+                  {requiresActive && <Lock className="w-3 h-3 text-gray-400" />}
                 </button>
               );
             })}
@@ -369,13 +382,21 @@ export default function Navbar({
           {/* Reports & Sources */}
           <div className="space-y-1 pt-2 border-t border-gray-100">
             <button
-              onClick={() => handleNavClick('report')}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs rounded-xl font-semibold transition-colors cursor-pointer ${
-                currentView === 'report' ? 'bg-agri-primary text-white' : 'text-gray-700 hover:bg-gray-100'
+              disabled={!hasActiveDataset}
+              onClick={() => handleNavClick('report', true)}
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-xl font-semibold transition-colors ${
+                !hasActiveDataset
+                  ? 'opacity-50 cursor-not-allowed text-gray-400'
+                  : currentView === 'report'
+                  ? 'bg-agri-primary text-white cursor-pointer'
+                  : 'text-gray-700 hover:bg-gray-100 cursor-pointer'
               }`}
             >
-              <FileText className="w-4 h-4" />
-              <span>{t.nav.report}</span>
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-4 h-4" />
+                <span>{t.nav.report}</span>
+              </div>
+              {!hasActiveDataset && <Lock className="w-3 h-3 text-gray-400" />}
             </button>
             <button
               onClick={() => handleNavClick('sources')}

@@ -8,8 +8,21 @@ import {
   ResponsiveContainer, CartesianGrid, ReferenceLine, ZAxis 
 } from 'recharts';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function RainfallYieldView({ profile, t, role = 'farmer' }) {
+export default function RainfallYieldView({ profile, t, role = 'farmer', onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Rainfall vs. Crop Yield Analysis"
+        subtitle="Please load or upload a dataset to compute agro-climatic correlation models and regression trends."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

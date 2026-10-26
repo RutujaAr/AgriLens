@@ -4,8 +4,21 @@ import {
   Sprout, CloudRain, MapPin, Sparkles, Loader2 
 } from 'lucide-react';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function ReportView({ profile, t, lang, role = 'farmer' }) {
+export default function ReportView({ profile, t, lang, role = 'farmer', onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Comprehensive Agricultural Analysis Report"
+        subtitle="Please load or upload a dataset to generate a full printable analytical report with executive summary and audit history."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [summaryData, setSummaryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

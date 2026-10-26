@@ -7,8 +7,21 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid 
 } from 'recharts';
 import { api } from '../api';
+import EmptyDatasetState from '../components/EmptyDatasetState';
 
-export default function EDAView({ profile, t }) {
+export default function EDAView({ profile, t, onExploreDemo, isDemoLoading = false, setCurrentView }) {
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Exploratory Data Analysis"
+        subtitle="Please load or upload a dataset to compute numerical statistics, category distributions, and feature correlations."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   const [activeTab, setActiveTab] = useState('numerical'); // 'numerical', 'distributions', 'categorical', 'correlation'
   const [edaData, setEdaData] = useState(null);
   const [corrData, setCorrData] = useState(null);
