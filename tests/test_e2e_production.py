@@ -61,12 +61,14 @@ def make_request(endpoint, data=None, token=None, method=None, files=None):
     else:
         # Pure HTTP mode
         base = TEST_API_BASE.rstrip("/")
-        # If testing root /health or /
-        if endpoint in ["/health", "/"]:
-            url = base[:-4] + endpoint if base.endswith("/api") else f"{base}{endpoint}"
+        # If base doesn't end with /api, ensure endpoints are properly routed
+        if endpoint in ["/health", "/", "/download/sample-csv", "/data-sources"]:
+            url = f"{base}{endpoint}"
+        elif endpoint.startswith("/api/"):
+            url = f"{base}{endpoint}"
         else:
-            ep_clean = endpoint if not endpoint.startswith("/api") else endpoint[4:]
-            url = f"{base}{ep_clean}"
+            url = f"{base}/api{endpoint}"
+
 
         headers = {}
         if data:
@@ -228,7 +230,7 @@ def run_all_tests():
             f"--{boundary}--\r\n"
         ).encode("utf-8")
         req = urllib.request.Request(
-            f"{TEST_API_BASE.rstrip('/')}/datasets/upload",
+            f"{TEST_API_BASE.rstrip('/')}/api/datasets/upload",
             data=body,
             headers={
                 "Content-Type": f"multipart/form-data; boundary={boundary}",
@@ -273,7 +275,7 @@ def run_all_tests():
             f"--{boundary}--\r\n"
         ).encode("utf-8")
         req = urllib.request.Request(
-            f"{TEST_API_BASE.rstrip('/')}/datasets/upload",
+            f"{TEST_API_BASE.rstrip('/')}/api/datasets/upload",
             data=body,
             headers={
                 "Content-Type": f"multipart/form-data; boundary={boundary}",
