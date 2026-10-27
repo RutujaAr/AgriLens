@@ -164,16 +164,12 @@ def run_all_tests():
     assert clean_res["updated_profile"]["quality_score"] == 100.0, f"Quality score not 100%: {clean_res['updated_profile']['quality_score']}"
     print(f" [PASS 7/14] Data Cleaning Pipeline: OK (Quality score updated to 100.0%)")
 
-    # 8. Complete Analytical Pipeline (EDA, Correlations, Rainfall-Yield, States, Visualizations, Insights, Summary)
+    # 8. Complete Analytical Pipeline (EDA, Correlations, States, Visualizations, Insights, Summary)
     status, eda = make_request(f"/datasets/{demo_id}/eda", token=farmer_token)
     assert status == 200 and len(eda.get("numerical_stats", {})) >= 6, "EDA calculation failed"
 
     status, corr = make_request(f"/datasets/{demo_id}/correlations", token=farmer_token)
     assert status == 200 and len(corr.get("columns", [])) >= 6, "Correlation calculation failed"
-
-    status, rfy = make_request(f"/datasets/{demo_id}/rainfall-yield", token=farmer_token)
-    assert status == 200 and rfy.get("available") is True, f"Rainfall-Yield analysis failed: {rfy}"
-    assert "correlation_coefficient" in rfy, "Rainfall-Yield correlation_coefficient missing"
 
     status, states = make_request(f"/datasets/{demo_id}/state-analysis", token=farmer_token)
     assert status == 200 and len(states.get("state_summaries", [])) >= 10, "State analysis failed"
@@ -186,7 +182,8 @@ def run_all_tests():
 
     status, summary = make_request(f"/datasets/{demo_id}/summary", token=farmer_token)
     assert status == 200 and "dataset_info" in summary, "Summary report compilation failed"
-    print(" [PASS 8/14] Full Analytical Pipeline (EDA, Corr, Rain-Yield, States, Viz, Insights, Summary): OK")
+    assert "rainfall_yield" not in summary, "Dedicated rainfall_yield should be removed from summary report"
+    print(" [PASS 8/14] Full Analytical Pipeline (EDA, Corr, States, Viz, Insights, Summary): OK")
 
     # 9. Role-Based Access Control
     status, officer_audit = make_request(f"/officer/audit-summary/{demo_id}", token=officer_token)
@@ -254,24 +251,23 @@ def run_all_tests():
     print(f" [PASS 12/14] Dataset Ownership & Isolation: OK (User owns ID {upload_id})")
 
     # 13. Missing-Variable Graceful Handling
-    # Upload dataset missing rainfall and yield
-    no_rf_csv = (
-        "State,Crop,Year\n"
-        "Punjab,Wheat,2022\n"
-        "Haryana,Wheat,2022\n"
-        "Gujarat,Cotton,2022\n"
-        "Maharashtra,Soyabean,2022\n"
+    # Upload dataset missing geographic state variable
+    no_state_csv = (
+        "Crop,Year,Crop_Production_tonnes\n"
+        "Wheat,2022,5000\n"
+        "Cotton,2022,3000\n"
+        "Soyabean,2022,4000\n"
     )
     if USE_TESTCLIENT:
-        files = {"file": ("no_rf.csv", io.BytesIO(no_rf_csv.encode("utf-8")), "text/csv")}
-        status, no_rf_prof = make_request("/datasets/upload", files=files, token=user2_token)
+        files = {"file": ("no_state.csv", io.BytesIO(no_state_csv.encode("utf-8")), "text/csv")}
+        status, no_state_prof = make_request("/datasets/upload", files=files, token=user2_token)
     else:
         boundary = "----AgriLensBoundaryAudit2"
         body = (
             f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="file"; filename="no_rf.csv"\r\n'
+            f'Content-Disposition: form-data; name="file"; filename="no_state.csv"\r\n'
             f"Content-Type: text/csv\r\n\r\n"
-            f"{no_rf_csv}\r\n"
+            f"{no_state_csv}\r\n"
             f"--{boundary}--\r\n"
         ).encode("utf-8")
         req = urllib.request.Request(
@@ -284,15 +280,15 @@ def run_all_tests():
             method="POST"
         )
         with urllib.request.urlopen(req) as resp:
-            no_rf_prof = json.loads(resp.read().decode("utf-8"))
+            no_state_prof = json.loads(resp.read().decode("utf-8"))
             status = resp.status
 
-    no_rf_id = no_rf_prof["id"]
-    status, no_rf_res = make_request(f"/datasets/{no_rf_id}/rainfall-yield", token=user2_token)
-    assert status == 200, f"Rainfall-Yield returned non-200: {status}"
-    assert no_rf_res.get("available") is False, f"Expected available: False, got: {no_rf_res}"
-    assert "reason" in no_rf_res and len(no_rf_res["reason"]) > 10, "Missing variable reason was empty"
-    print(f" [PASS 13/14] Missing Variable Handling (Rainfall-Yield available=False with explanation): OK")
+    no_state_id = no_state_prof["id"]
+    status, no_state_res = make_request(f"/datasets/{no_state_id}/state-analysis", token=user2_token)
+    assert status == 200, f"State-analysis returned non-200: {status}"
+    assert no_state_res.get("available") is False, f"Expected available: False, got: {no_state_res}"
+    assert "reason" in no_state_res and len(no_state_res["reason"]) > 10, "Missing variable reason was empty"
+    print(f" [PASS 13/14] Missing Variable Handling (State-Analysis available=False with explanation): OK")
 
     # 14. Ephemeral Cloud Container Resilience
     if USE_TESTCLIENT:

@@ -132,7 +132,6 @@ export const api = {
   // Analytics
   getEDA: (id) => request(`/datasets/${id}/eda`),
   getCorrelations: (id) => request(`/datasets/${id}/correlations`),
-  getRainfallYield: (id) => request(`/datasets/${id}/rainfall-yield`),
   getStateAnalysis: (id) => request(`/datasets/${id}/state-analysis`),
   getVisualizations: (id) => request(`/datasets/${id}/visualizations`),
   getInsights: (id) => request(`/datasets/${id}/insights`),

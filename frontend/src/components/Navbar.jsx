@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sprout, Globe, User, LogOut, LogIn, Menu, X, 
   BarChart3, UploadCloud, Database, PieChart, 
-  CloudRain, MapPin, Sparkles, FileText, Bookmark,
+  MapPin, Sparkles, FileText, Bookmark,
   ChevronDown, Lock, Layers
 } from 'lucide-react';
 
@@ -31,7 +31,6 @@ export default function Navbar({
     { id: 'cleaning', label: t.nav.cleaning, desc: "Imputation & duplicate removal", icon: Sprout },
     { id: 'eda', label: t.nav.eda, desc: "Descriptive statistics & correlation", icon: BarChart3 },
     { id: 'visualizations', label: t.nav.visualizations, desc: "Production, area & trend charts", icon: PieChart },
-    { id: 'rainfall', label: t.nav.rainfallYield, desc: "Precipitation vs productivity", icon: CloudRain },
     { id: 'states', label: t.nav.states, desc: "Geographical India state analysis", icon: MapPin },
     { id: 'insights', label: t.nav.insights, desc: "Automated statistical takeaways", icon: Sparkles },
   ];
@@ -39,7 +38,6 @@ export default function Navbar({
   // Analytics sub-items for Farmer
   const farmerAnalyticsItems = [
     { id: 'visualizations', label: t.nav.visualizations, desc: "Production & crop distribution", icon: PieChart },
-    { id: 'rainfall', label: t.nav.rainfallYield, desc: "Rainfall impact on crop yield", icon: CloudRain },
     { id: 'states', label: t.nav.states, desc: "Major crop producing states", icon: MapPin },
     { id: 'insights', label: t.nav.insights, desc: "Clear agricultural recommendations", icon: Sparkles },
   ];

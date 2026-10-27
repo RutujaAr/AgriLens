@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   BarChart3, UploadCloud, Database, Sprout, 
-  CloudRain, MapPin, FileText, CheckCircle2, 
+  PieChart, MapPin, FileText, CheckCircle2, 
   ShieldCheck, RefreshCw, Layers
 } from 'lucide-react';
 
@@ -233,7 +233,7 @@ export default function DashboardView({
           {t.dashboard.pipelineTitle}
         </h3>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {t.dashboard.pipelineSteps.map((step, idx) => (
             <div 
               key={idx}
@@ -285,12 +285,12 @@ export default function DashboardView({
           </button>
 
           <button
-            onClick={() => setCurrentView('rainfall')}
+            onClick={() => setCurrentView('visualizations')}
             className="p-4 rounded-xl bg-white border border-agri-border hover:border-agri-leaf hover:bg-agri-light/40 shadow-xs transition-all text-left group cursor-pointer"
           >
-            <CloudRain className="w-5 h-5 text-sky-600 mb-2 group-hover:scale-110 transition-transform" />
-            <h4 className="text-xs font-bold text-agri-text">{t.dashboard.viewRainfall}</h4>
-            <p className="text-[10px] text-agri-muted mt-0.5">Precipitation vs yield</p>
+            <PieChart className="w-5 h-5 text-sky-600 mb-2 group-hover:scale-110 transition-transform" />
+            <h4 className="text-xs font-bold text-agri-text">{t.nav.visualizations}</h4>
+            <p className="text-[10px] text-agri-muted mt-0.5">Production & trends</p>
           </button>
 
           <button

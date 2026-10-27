@@ -7,18 +7,6 @@ import { api } from '../api';
 import EmptyDatasetState from '../components/EmptyDatasetState';
 
 export default function ReportView({ profile, t, lang, role = 'farmer', onExploreDemo, isDemoLoading = false, setCurrentView }) {
-  if (!profile) {
-    return (
-      <EmptyDatasetState 
-        title="Comprehensive Agricultural Analysis Report"
-        subtitle="Please load or upload a dataset to generate a full printable analytical report with executive summary and audit history."
-        onExploreDemo={onExploreDemo}
-        isDemoLoading={isDemoLoading}
-        setCurrentView={setCurrentView}
-      />
-    );
-  }
-
   const [summaryData, setSummaryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,6 +28,18 @@ export default function ReportView({ profile, t, lang, role = 'farmer', onExplor
     fetchSummary();
   }, [profile?.id, profile?.is_cleaned]);
 
+  if (!profile) {
+    return (
+      <EmptyDatasetState 
+        title="Comprehensive Agricultural Analysis Report"
+        subtitle="Please load or upload a dataset to generate a full printable analytical report with executive summary and audit history."
+        onExploreDemo={onExploreDemo}
+        isDemoLoading={isDemoLoading}
+        setCurrentView={setCurrentView}
+      />
+    );
+  }
+
   if (loading) {
     return (
       <div className="py-20 text-center">
@@ -57,7 +57,7 @@ export default function ReportView({ profile, t, lang, role = 'farmer', onExplor
     );
   }
 
-  const { dataset_info, cleaning_report, eda, rainfall_yield, state_analysis, insights, data_source_metadata } = summaryData;
+  const { dataset_info, cleaning_report, eda, state_analysis, insights, data_source_metadata } = summaryData;
 
   const isOfficer = role === 'officer';
 
@@ -171,31 +171,7 @@ export default function ReportView({ profile, t, lang, role = 'farmer', onExplor
           )}
         </div>
 
-        {/* Section 3: Agro-Climatic Relationship (Rainfall vs Yield) */}
-        {rainfall_yield && rainfall_yield.available && (
-          <div>
-            <h3 className="text-sm font-bold text-agri-dark uppercase tracking-wider mb-3">
-              {t.report.rainfallRelationship}
-            </h3>
-            <div className="bg-[#F8FAF9] p-4 rounded-xl border border-agri-border text-xs space-y-2">
-              <div className="flex flex-wrap items-baseline gap-4">
-                <div>
-                  <span className="text-gray-500">Correlation Coefficient:</span>
-                  <span className="font-bold text-agri-dark ml-1 font-mono">r = {rainfall_yield.correlation_coefficient}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Relationship Strength:</span>
-                  <span className="font-bold text-agri-primary ml-1">{rainfall_yield.relationship_strength}</span>
-                </div>
-              </div>
-              <p className="text-agri-text font-medium italic pt-1">
-                "{rainfall_yield.statistical_interpretation}"
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Section 4: State Rankings */}
+        {/* Section 3: State Rankings */}
         {state_analysis && state_analysis.available && (
           <div>
             <h3 className="text-sm font-bold text-agri-dark uppercase tracking-wider mb-3">
@@ -225,7 +201,7 @@ export default function ReportView({ profile, t, lang, role = 'farmer', onExplor
           </div>
         )}
 
-        {/* Section 5: Synthesized Key Insights */}
+        {/* Section 4: Synthesized Key Insights */}
         {insights?.insights?.length > 0 && (
           <div>
             <h3 className="text-sm font-bold text-agri-dark uppercase tracking-wider mb-3">
@@ -250,7 +226,7 @@ export default function ReportView({ profile, t, lang, role = 'farmer', onExplor
           </div>
         )}
 
-        {/* Section 6: Official Data Citations */}
+        {/* Section 5: Official Data Citations */}
         {data_source_metadata && (
           <div className="border-t border-gray-200 pt-6 text-xs text-agri-muted space-y-1">
             <h4 className="font-bold text-agri-dark">{t.report.dataAuthenticityCitations}</h4>

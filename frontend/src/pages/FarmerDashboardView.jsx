@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sprout, CloudRain, MapPin, Sparkles, 
   UploadCloud, ShieldCheck, CheckCircle2, 
-  ChevronDown, ChevronUp, Info, 
   Loader2, Printer
 } from 'lucide-react';
 import { 
   BarChart, Bar, LineChart, Line, 
-  ScatterChart, Scatter, XAxis, YAxis, Tooltip, 
-  ResponsiveContainer, CartesianGrid, ZAxis 
+  XAxis, YAxis, Tooltip, 
+  ResponsiveContainer, CartesianGrid 
 } from 'recharts';
 import { api } from '../api';
 import IndiaMap from '../components/IndiaMap';
@@ -24,24 +23,23 @@ export default function FarmerDashboardView({
 }) {
   const [loading, setLoading] = useState(true);
   const [vizData, setVizData] = useState(null);
-  const [rainfallData, setRainfallData] = useState(null);
+  const [edaData, setEdaData] = useState(null);
   const [stateData, setStateData] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
-  const [showStatsDetails, setShowStatsDetails] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
     const fetchFarmerData = async () => {
       setLoading(true);
       try {
-        const [viz, rf, st, ins] = await Promise.all([
+        const [viz, eda, st, ins] = await Promise.all([
           api.getVisualizations(profile.id).catch(() => null),
-          api.getRainfallYield(profile.id).catch(() => null),
+          api.getEDA(profile.id).catch(() => null),
           api.getStateAnalysis(profile.id).catch(() => null),
           api.getInsights(profile.id).catch(() => null)
         ]);
         setVizData(viz);
-        setRainfallData(rf);
+        setEdaData(eda);
         setStateData(st);
         setInsightsData(ins);
       } catch (err) {
@@ -119,6 +117,23 @@ export default function FarmerDashboardView({
   const yearlyTrendChart = charts.find(c => c.id === 'yearly_trend_line');
   const insights = insightsData?.insights || [];
 
+  let avgYield = null;
+  let avgRainfall = null;
+  if (edaData?.numerical_stats) {
+    for (const [colName, stats] of Object.entries(edaData.numerical_stats)) {
+      if (stats.variable_role === 'yield') {
+        avgYield = stats.mean;
+      } else if (avgYield === null && /yield/i.test(colName)) {
+        avgYield = stats.mean;
+      }
+      if (stats.variable_role === 'rainfall') {
+        avgRainfall = stats.mean;
+      } else if (avgRainfall === null && /rain/i.test(colName)) {
+        avgRainfall = stats.mean;
+      }
+    }
+  }
+
   return (
     <div className="space-y-8 py-6">
       
@@ -189,7 +204,7 @@ export default function FarmerDashboardView({
               <div>
                 <span className="text-[11px] font-semibold text-agri-muted uppercase tracking-wider">{t.farmer.yieldTitle}</span>
                 <p className="text-xl font-extrabold text-amber-900 mt-0.5">
-                  {rainfallData?.summary_stats?.avg_yield ? `${rainfallData.summary_stats.avg_yield.toLocaleString()} kg/ha` : "N/A"}
+                  {avgYield != null ? `${avgYield.toLocaleString()} kg/ha` : "N/A"}
                 </p>
                 <p className="text-[11px] text-gray-500">
                   {t.farmer.yieldSubtitle}
@@ -205,10 +220,10 @@ export default function FarmerDashboardView({
               <div>
                 <span className="text-[11px] font-semibold text-agri-muted uppercase tracking-wider">{t.farmer.rainfallTitle}</span>
                 <p className="text-xl font-extrabold text-sky-900 mt-0.5">
-                  {rainfallData?.summary_stats?.avg_rainfall ? `${rainfallData.summary_stats.avg_rainfall} mm` : "N/A"}
+                  {avgRainfall != null ? `${avgRainfall} mm` : "N/A"}
                 </p>
                 <p className="text-[11px] text-gray-500">
-                  {rainfallData?.summary_stats?.avg_rainfall ? t.farmer.rainfallRecorded : t.farmer.notRecorded}
+                  {avgRainfall != null ? t.farmer.rainfallRecorded : t.farmer.notRecorded}
                 </p>
               </div>
             </div>
@@ -342,112 +357,7 @@ export default function FarmerDashboardView({
 
           </div>
 
-          {/* SECTION 4: Plain-Language Rainfall vs. Crop Yield Module with Collapsible Stats Details */}
-          {rainfallData && rainfallData.available ? (
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-agri-border shadow-xs space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 gap-2">
-                <div>
-                  <h3 className="text-lg font-bold text-agri-dark flex items-center gap-2">
-                    <CloudRain className="w-5 h-5 text-sky-600" />
-                    <span>{t.farmer.rainfallImpactTitle}</span>
-                  </h3>
-                  <p className="text-xs text-agri-muted mt-0.5">
-                    {t.farmer.rainfallImpactSubtitle}
-                  </p>
-                </div>
-
-                {/* Plain language summary pill */}
-                <span className="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  {rainfallData.relationship_strength || "Positive Association"}
-                </span>
-              </div>
-
-              {/* Plain-Language Message Callout */}
-              <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 text-xs sm:text-sm text-sky-950 leading-relaxed flex items-start gap-3">
-                <Info className="w-5 h-5 text-sky-700 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-agri-dark">
-                    "{rainfallData.statistical_interpretation}"
-                  </p>
-                  <p className="text-xs text-sky-800 mt-1">
-                    {t.rainfall.nonCausalNote}
-                  </p>
-                </div>
-              </div>
-
-              {/* Scatter Plot */}
-              <div className="h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 15, right: 15, bottom: 15, left: 15 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis type="number" dataKey="rainfall" name={t.rainfall.xAxis} unit=" mm" tick={{ fontSize: 11 }} />
-                    <YAxis type="number" dataKey="yield" name={t.rainfall.yAxis} unit=" kg/ha" tick={{ fontSize: 11 }} />
-                    <ZAxis range={[50, 150]} />
-                    <Tooltip 
-                      cursor={{ strokeDasharray: '3 3' }}
-                      content={({ payload }) => {
-                        if (payload && payload.length) {
-                          const d = payload[0].payload;
-                          return (
-                            <div className="bg-white p-3 rounded-xl border border-agri-border shadow-lg text-xs space-y-1">
-                              <p className="font-bold text-agri-dark">{d.crop} ({d.state})</p>
-                              <p className="text-gray-600">Rainfall: <span className="font-semibold">{d.rainfall} mm</span></p>
-                              <p className="text-gray-600">Yield: <span className="font-semibold">{d.yield?.toLocaleString()} kg/ha</span></p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Scatter data={rainfallData.scatter_data} fill="#2E7D32" shape="circle" />
-                  </ScatterChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Optional Collapsible Technical Statistics Details for Curious Farmers/Teachers */}
-              <div className="border-t border-gray-100 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setShowStatsDetails(!showStatsDetails)}
-                  className="text-xs font-semibold text-agri-primary hover:text-agri-dark flex items-center gap-1.5 cursor-pointer py-1"
-                >
-                  {showStatsDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  <span>{showStatsDetails ? t.farmer.hideStatsDetails : t.farmer.viewStatsDetails}</span>
-                </button>
-
-                {showStatsDetails && (
-                  <div className="mt-3 p-4 rounded-xl bg-gray-50 border border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs animate-in fade-in duration-150">
-                    <div>
-                      <span className="text-gray-500">Pearson r:</span>
-                      <p className="font-mono font-bold text-agri-dark text-sm">r = {rainfallData.correlation_coefficient}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">p-value:</span>
-                      <p className="font-mono font-bold text-agri-dark text-sm">{rainfallData.summary_stats?.p_value}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Trend Equation:</span>
-                      <p className="font-mono font-bold text-agri-dark text-xs">y = {rainfallData.regression_line?.slope}x + {rainfallData.regression_line?.intercept}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Rainfall Range:</span>
-                      <p className="font-bold text-agri-dark text-xs">{rainfallData.summary_stats?.min_rainfall} – {rainfallData.summary_stats?.max_rainfall} mm</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-3xl p-6 border border-agri-border shadow-xs text-center py-8">
-              <CloudRain className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-agri-text">{t.rainfall.unavailableTitle}</h4>
-              <p className="text-xs text-agri-muted max-w-md mx-auto mt-1">
-                {rainfallData?.reason || t.farmer.noRainfallData}
-              </p>
-            </div>
-          )}
-
-          {/* SECTION 5: Regional Analysis & Interactive India Map */}
+          {/* SECTION 4: Regional Analysis & Interactive India Map */}
           {stateData && stateData.available && (
             <div>
               <IndiaMap stateAnalysisData={stateData} t={t} />

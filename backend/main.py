@@ -28,7 +28,7 @@ from .models import User, DatasetRecord
 from .schemas import (
     UserRegister, UserLogin, UserResponse, TokenResponse,
     DatasetProfile, CleaningOptions, CleaningReport,
-    EDAResponse, CorrelationResponse, RainfallYieldResponse,
+    EDAResponse, CorrelationResponse,
     StateAnalysisResponse, InsightsResponse, DataSourceInfo
 )
 from .auth import (
@@ -43,7 +43,7 @@ from .dataset_service import (
     load_dataset_file, profile_dataset, clean_and_preprocess_dataset
 )
 from .analytics_service import (
-    compute_eda, compute_correlation_matrix, analyze_rainfall_vs_crop_yield,
+    compute_eda, compute_correlation_matrix,
     analyze_states, generate_automatic_visualizations, generate_agricultural_insights
 )
 
@@ -596,14 +596,6 @@ def get_correlations(dataset_id: int, db: Session = Depends(get_db)):
     df, _ = get_active_df(rec)
     return compute_correlation_matrix(df)
 
-@app.get("/api/datasets/{dataset_id}/rainfall-yield", response_model=RainfallYieldResponse)
-def get_rainfall_yield(dataset_id: int, db: Session = Depends(get_db)):
-    rec = db.query(DatasetRecord).filter(DatasetRecord.id == dataset_id).first()
-    if not rec:
-        raise HTTPException(status_code=404, detail="Dataset not found")
-    df, col_mappings = get_active_df(rec)
-    return analyze_rainfall_vs_crop_yield(df, col_mappings)
-
 @app.get("/api/datasets/{dataset_id}/state-analysis", response_model=StateAnalysisResponse)
 def get_state_analysis(dataset_id: int, db: Session = Depends(get_db)):
     rec = db.query(DatasetRecord).filter(DatasetRecord.id == dataset_id).first()
@@ -646,7 +638,6 @@ def get_complete_summary(dataset_id: int, db: Session = Depends(get_db)):
     df, col_mappings = get_active_df(rec)
 
     eda = compute_eda(df, col_mappings)
-    rf_yield = analyze_rainfall_vs_crop_yield(df, col_mappings)
     states = analyze_states(df, col_mappings)
     viz = generate_automatic_visualizations(df, col_mappings)
     insights = generate_agricultural_insights(df, col_mappings, rec.quality_score, rec.original_name)
@@ -667,7 +658,6 @@ def get_complete_summary(dataset_id: int, db: Session = Depends(get_db)):
         },
         "cleaning_report": cleaning_report,
         "eda": eda,
-        "rainfall_yield": rf_yield,
         "state_analysis": states,
         "visualizations": viz,
         "insights": insights,

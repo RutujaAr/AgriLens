@@ -1,6 +1,5 @@
-import React from 'react';
 import { 
-  Sprout, UploadCloud, BarChart3, CloudRain, 
+  Sprout, UploadCloud, BarChart3, TrendingUp, 
   MapPin, Sparkles, ShieldCheck, ArrowRight, 
   Layers, Globe2, Compass, Award, Loader2
 } from 'lucide-react';
@@ -18,7 +17,7 @@ export default function LandingPage({ t, onGetStarted, onExploreDemo, isDemoLoad
     { title: t.landing.cap1, desc: t.landing.cap1Desc, icon: Layers },
     { title: t.landing.cap2, desc: t.landing.cap2Desc, icon: Award },
     { title: t.landing.cap3, desc: t.landing.cap3Desc, icon: BarChart3 },
-    { title: t.landing.cap4, desc: t.landing.cap4Desc, icon: CloudRain },
+    { title: t.landing.cap4, desc: t.landing.cap4Desc, icon: TrendingUp },
     { title: t.landing.cap5, desc: t.landing.cap5Desc, icon: MapPin },
     { title: t.landing.cap6, desc: t.landing.cap6Desc, icon: Globe2 },
   ];
@@ -134,9 +133,9 @@ export default function LandingPage({ t, onGetStarted, onExploreDemo, isDemoLoad
             <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-100 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] font-bold text-purple-800 uppercase tracking-wider block">Workflow 04</span>
-                <p className="text-sm font-bold text-purple-950 mt-1">Rainfall, Yield & State Analysis</p>
+                <p className="text-sm font-bold text-purple-950 mt-1">Regional & State Analysis</p>
                 <p className="text-[11px] text-purple-700 mt-1 leading-snug">
-                  Pearson statistical correlation & geographic state ranking when supported.
+                  Geographic state rankings and interactive regional comparisons when supported.
                 </p>
               </div>
             </div>

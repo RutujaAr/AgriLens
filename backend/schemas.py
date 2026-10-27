@@ -87,20 +87,6 @@ class CorrelationResponse(BaseModel):
     matrix: List[List[float]]
     strongest_correlations: List[Dict[str, Any]]
 
-class RainfallYieldResponse(BaseModel):
-    available: bool
-    reason: Optional[str] = None
-    rainfall_column: Optional[str] = None
-    yield_column: Optional[str] = None
-    is_derived_yield: bool = False
-    derivation_formula: Optional[str] = None
-    correlation_coefficient: Optional[float] = None
-    relationship_strength: Optional[str] = None
-    statistical_interpretation: Optional[str] = None
-    scatter_data: List[Dict[str, Any]] = []
-    regression_line: Optional[Dict[str, Any]] = None
-    summary_stats: Optional[Dict[str, Any]] = None
-
 class StateAnalysisResponse(BaseModel):
     available: bool
     reason: Optional[str] = None

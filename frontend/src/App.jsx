@@ -9,7 +9,6 @@ import InspectionView from './pages/InspectionView';
 import CleaningView from './pages/CleaningView';
 import EDAView from './pages/EDAView';
 import VisualizationsView from './pages/VisualizationsView';
-import RainfallYieldView from './pages/RainfallYieldView';
 import StateAnalysisView from './pages/StateAnalysisView';
 import InsightsView from './pages/InsightsView';
 import ReportView from './pages/ReportView';
@@ -38,7 +37,9 @@ export default function App() {
   });
   const [currentView, setCurrentView] = useState(() => {
     try {
-      return localStorage.getItem('agrilens_current_view') || 'landing';
+      const saved = localStorage.getItem('agrilens_current_view');
+      if (saved === 'rainfall') return 'dashboard';
+      return saved || 'landing';
     } catch {
       return 'landing';
     }
@@ -249,17 +250,6 @@ export default function App() {
             profile={activeProfile} 
             t={t} 
             lang={lang} 
-            onExploreDemo={handleExploreDemo}
-            isDemoLoading={isDemoLoading}
-            setCurrentView={setCurrentView}
-          />
-        )}
-
-        {currentView === 'rainfall' && (
-          <RainfallYieldView 
-            profile={activeProfile} 
-            t={t} 
-            role={effectiveRole}
             onExploreDemo={handleExploreDemo}
             isDemoLoading={isDemoLoading}
             setCurrentView={setCurrentView}
